@@ -6,8 +6,8 @@ targetCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
   compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-  compileOnly 'com.android.tools.lint:lint-api:26.6.3'
-  compileOnly 'com.android.tools.lint:lint-checks:26.6.3'
+  compileOnly 'com.android.tools.lint:lint-api:27.0.1'
+  compileOnly 'com.android.tools.lint:lint-checks:27.0.1'
 }
 
 jar {

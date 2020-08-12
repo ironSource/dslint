@@ -44,7 +44,7 @@ abstract class DSLintDetector : Detector(),
                         return
                     }
 
-                    visitDslLintLambda(context, node, lambdaReceiverType!!)
+                    visitDslLintLambda(context, node, lambdaReceiverType)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

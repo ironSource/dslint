@@ -1,0 +1,17 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+
+dependencies {
+  compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+  compileOnly 'com.android.tools.lint:lint-api:26.6.3'
+  compileOnly 'com.android.tools.lint:lint-checks:26.6.3'
+}
+
+jar {
+  manifest {
+    attributes 'Lint-Registry-v2': 'com.ironsource.aura.dslint.LintRegistry'
+  }
+}

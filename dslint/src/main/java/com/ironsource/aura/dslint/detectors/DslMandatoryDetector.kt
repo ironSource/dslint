@@ -31,14 +31,10 @@ class DslMandatoryDetector : DSLintDetector() {
     ) {
         val dslPropertiesDefs = getDslMandatoryProperties(dslLintClass)
 
-        println("Defs = $dslPropertiesDefs")
-
         val dslPropertiesCalls = getDslMandatoryCallsCount(
             dslPropertiesDefs,
             node.body as UBlockExpression
         )
-
-        println("Calls = $dslPropertiesCalls")
 
         // Report groups with no calls
         dslPropertiesCalls

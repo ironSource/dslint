@@ -7,6 +7,7 @@ import com.ironsource.aura.dslint.DSLintAnnotation
 import com.ironsource.aura.dslint.utils.resolveAttributeValue
 import org.jetbrains.uast.*
 import org.jetbrains.uast.util.isAssignment
+import org.jetbrains.uast.util.isMethodCall
 import kotlin.contracts.ExperimentalContracts
 
 @ExperimentalContracts
@@ -30,14 +31,14 @@ class DslMandatoryDetector : DSLintDetector() {
     ) {
         val dslPropertiesDefs = getDslMandatoryProperties(dslLintClass)
 
-//        println("Defs = $dslPropertiesDefs")
+        println("Defs = $dslPropertiesDefs")
 
-        val dslPropertiesCalls = getDslMandatoryPropertiesCallsCount(
+        val dslPropertiesCalls = getDslMandatoryCallsCount(
             dslPropertiesDefs,
             node.body as UBlockExpression
         )
 
-//        println("Calls = $dslPropertiesCalls")
+        println("Calls = $dslPropertiesCalls")
 
         // Report groups with no calls
         dslPropertiesCalls
@@ -50,12 +51,42 @@ class DslMandatoryDetector : DSLintDetector() {
             }
     }
 
-    // Returns mapping of group name to calls count
-    private fun getDslMandatoryPropertiesCallsCount(
+    private fun getDslMandatoryCallsCount(
         dslProperties: Map<String, List<DSLMandatoryProperty>>,
         blockBody: UBlockExpression
     ): Map<String, Int> {
-        val res = blockBody.expressions
+        val propertiesCalls = getDslPropertiesCallsCount(dslProperties, blockBody)
+        val functionsCalls = getDslMandatoryFunctionsCallsCount(dslProperties, blockBody)
+
+        return (propertiesCalls + functionsCalls).toMutableMap()
+            .apply {
+                dslProperties.keys.forEach {
+                    this@apply.putIfAbsent(it, 0)
+                }
+            }
+    }
+
+    // Returns mapping of group name to calls count
+    private fun getDslMandatoryFunctionsCallsCount(
+        dslProperties: Map<String, List<DSLMandatoryProperty>>,
+        blockBody: UBlockExpression
+    ): Map<String, Int> {
+        return blockBody.expressions
+            .filterIsInstance<UCallExpression>()
+            .filter { it.isMethodCall() }
+            .mapNotNull {
+                getPropertyGroup(it.methodName!!, dslProperties)
+            }
+            .groupingBy { it }
+            .eachCount()
+    }
+
+    // Returns mapping of group name to calls count
+    private fun getDslPropertiesCallsCount(
+        dslProperties: Map<String, List<DSLMandatoryProperty>>,
+        blockBody: UBlockExpression
+    ): Map<String, Int> {
+        return blockBody.expressions
             .filterIsInstance<UBinaryExpression>()
             .filter { it.isAssignment() }
             .mapNotNull {
@@ -63,13 +94,6 @@ class DslMandatoryDetector : DSLintDetector() {
             }
             .groupingBy { it }
             .eachCount()
-            .toMutableMap()
-
-        dslProperties.keys.forEach {
-            res.putIfAbsent(it, 0)
-        }
-
-        return res
     }
 
     private fun getAssignedPropertyName(it: UBinaryExpression) =
@@ -91,9 +115,7 @@ class DslMandatoryDetector : DSLintDetector() {
 
     // Return mapping of group name to mandatory properties, properties with no group are grouped by their name
     private fun getDslMandatoryProperties(clazz: PsiClass): Map<String, List<DSLMandatoryProperty>> {
-        fun propertyNameFromSetter(setterName: String) = setterName.substring(3).decapitalize()
-
-        return PropertyUtilBase.getAllProperties(clazz, true, false, true).values
+        return clazz.allMethods
             .filter {
                 it.hasAnnotation(DSLintAnnotation.DslMandatory.name)
             }
@@ -101,8 +123,10 @@ class DslMandatoryDetector : DSLintDetector() {
                 val annotation = it.getAnnotation(DSLintAnnotation.DslMandatory.name)
                 val group =
                     annotation.resolveAttributeValue<String>(DSLintAnnotation.DslMandatory.Attributes.group)
+                val name =
+                    if (PropertyUtilBase.isSetterName(it.name)) PropertyUtilBase.getPropertyName(it)!! else it.name
                 DSLMandatoryProperty(
-                    propertyNameFromSetter(it.name),
+                    name,
                     group
                 )
             }

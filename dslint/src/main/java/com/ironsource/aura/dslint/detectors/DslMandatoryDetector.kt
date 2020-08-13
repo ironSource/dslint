@@ -15,7 +15,7 @@ class DslMandatoryDetector : DSLintDetector() {
 
     companion object {
         val ISSUE = Issue.create(
-            "DslMandatory",
+            "DSLMandatory",
             "Mandatory DSL property not defined",
             "Mandatory DSL property not defined",
             Category.CORRECTNESS, 6,

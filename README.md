@@ -1,8 +1,7 @@
 DSLint
 ============
 
-A lightweight Android linter for Kotlin DSL.
-This library aims to solve the problem of verifying mandatory DSL properties at compile time.
+A lightweight Android linter for Kotlin DSL aimed to solve the problem of verifying mandatory DSL properties at compile time.
 ---
  
 Usage
@@ -27,7 +26,7 @@ interface SomeDSLApi {
 }
 ```
 
-!(images/sample.png)
+![Sample](images/sample.png)
 
 Annotations
 ---

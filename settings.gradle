@@ -1,4 +1,5 @@
 rootProject.name='DSLint'
 include ':app'
 include ':dslint'
+include ':dslint-checks'
 include ':dslint-annotations'

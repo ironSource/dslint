@@ -8,7 +8,7 @@ fun dslTest(block: SomeDSLApi.() -> Unit) = SomeDslApiImpl().apply(block)
 @DSLint
 interface SomeDSLApi {
 
-    @set:DSLMandatory
+    @set:DSLMandatory(message = "ID please")
     var id: String
 
     @set:DSLMandatory(group = "name")

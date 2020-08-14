@@ -7,7 +7,8 @@ sealed class DSLintAnnotation(name: String) {
 
     object DslMandatory : DSLintAnnotation("DSLMandatory") {
         object Attributes {
-            val group = "group"
+            const val group = "group"
+            const val message = "message"
         }
     }
 }

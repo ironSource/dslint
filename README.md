@@ -10,7 +10,7 @@ Usage
 @DSLint
 interface SomeDSLApi {
 
-    @set:DSLMandatory
+    @set:DSLMandatory(message = "ID please")
     var id: String
 
     @set:DSLMandatory(group = "name")
@@ -43,6 +43,31 @@ Grouping
 Mandatory properties can be grouped together using the `group` attribute
 in the `@DSLMandatory` annotation.
 DSLint will verify that at least one of the properties in the group is defined.
+```kotlin
+@DSLint
+interface SomeDSLApi {
+
+    @set:DSLMandatory(group = "name")
+    var firstName: String
+
+    @set:DSLMandatory(group = "name")
+    var fullName: String
+}
+```
+
+Custom message
+---
+Custom error message can be defined using the `message` attribute in the `@DSLMandatory` annotation.
+A custom message for a grouped properties should be defined on the first property of the group.
+```kotlin
+@DSLint
+interface SomeDSLApi {
+
+    @set:DSLMandatory(message = "ID please")
+    var id: String
+}
+```
+![Sample](images/sample_custom.png)
 
 Download
 --------

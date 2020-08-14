@@ -40,10 +40,9 @@ class DslMandatoryDetector : DSLintDetector() {
         dslPropertiesCalls
             .filterValues { it == 0 }
             .forEach {
-                context.report(
-                    ISSUE, node, context.getLocation(node as UElement),
-                    "\"${it.key}\" property must be defined"
-                )
+                val message = dslPropertiesDefs[it.key]?.getOrNull(0)?.message
+                    ?: "\"${it.key}\" property must be defined"
+                context.report(ISSUE, node, context.getLocation(node as UElement), message)
             }
     }
 
@@ -119,12 +118,11 @@ class DslMandatoryDetector : DSLintDetector() {
                 val annotation = it.getAnnotation(DSLintAnnotation.DslMandatory.name)
                 val group =
                     annotation.resolveAttributeValue<String>(DSLintAnnotation.DslMandatory.Attributes.group)
+                val message =
+                    annotation.resolveAttributeValue<String>(DSLintAnnotation.DslMandatory.Attributes.message)
                 val name =
                     if (PropertyUtilBase.isSetterName(it.name)) PropertyUtilBase.getPropertyName(it)!! else it.name
-                DSLMandatoryProperty(
-                    name,
-                    group
-                )
+                DSLMandatoryProperty(name, group, if (!message.isNullOrEmpty()) message else null)
             }
             .groupBy {
                 if (!it.group.isNullOrEmpty()) it.group else it.name
@@ -134,5 +132,6 @@ class DslMandatoryDetector : DSLintDetector() {
 
 data class DSLMandatoryProperty(
     val name: String,
-    val group: String?
+    val group: String?,
+    val message: String?
 )

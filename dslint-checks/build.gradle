@@ -1,5 +1,6 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
+apply from: '../versions.gradle'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
@@ -15,3 +16,5 @@ jar {
     attributes 'Lint-Registry-v2': 'com.ironsource.aura.dslint.LintRegistry'
   }
 }
+
+apply from: rootProject.file('gradle/java_mvn_push.gradle')

@@ -44,4 +44,5 @@ task publishSdk {
     dependsOn 'clean'
     dependsOn 'dslint:bintrayUpload'
     dependsOn 'dslint-annotations:bintrayUpload'
+    dependsOn 'dslint-checks:bintrayUpload'
 }

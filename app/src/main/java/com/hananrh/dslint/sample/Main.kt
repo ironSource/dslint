@@ -1,10 +1,7 @@
 package com.hananrh.dslint.sample
 
-fun test() {
+fun create() {
     dslTest {
-        innerProp {
-            innerProp = ""
-            innerProp2()
-        }
+
     }
 }

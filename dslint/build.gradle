@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 
-apply from: 'versions.gradle'
+apply from: '../versions.gradle'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
@@ -25,6 +25,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+apply from: rootProject.file('gradle/android_mvn_push.gradle')
+
+afterEvaluate {
+    javadoc.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
 }
 
 dependencies {

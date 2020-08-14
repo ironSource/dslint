@@ -58,7 +58,7 @@ interface SomeDSLApi {
 Custom message
 ---
 Custom error message can be defined using the `message` attribute in the `@DSLMandatory` annotation.
-A custom message for a grouped properties should be defined on the first property of the group.
+A custom message for grouped properties should be defined on the first property of the group.
 ```kotlin
 @DSLint
 interface SomeDSLApi {

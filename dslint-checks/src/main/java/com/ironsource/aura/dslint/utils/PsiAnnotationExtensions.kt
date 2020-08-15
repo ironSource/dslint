@@ -12,4 +12,4 @@ fun <T> PsiAnnotation?.resolveAttributeValue(
 @Suppress("UNCHECKED_CAST")
 fun PsiAnnotation?.resolveStringAttributeValue(
     attribute: String
-) = resolveAttributeValue<Any>(attribute).toString()
+) = resolveAttributeValue<Any>(attribute)?.toString()

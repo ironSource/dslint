@@ -33,6 +33,9 @@ allprojects {
         maven {
             url "https://dl.bintray.com/kotlin/kotlin-eap/"
         }
+        maven {
+            url  "https://dl.bintray.com/ironsource-aura/DSLint"
+        }
     }
 }
 

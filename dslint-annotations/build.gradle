@@ -4,36 +4,33 @@ apply plugin: 'kotlin-android'
 apply from: '../versions.gradle'
 
 android {
-  compileSdkVersion COMPILE_SDK_VERSION
+    compileSdkVersion COMPILE_SDK_VERSION
 
-  defaultConfig {
-    minSdkVersion MIN_SDK_VERSION
-    targetSdkVersion TARGET_SDK_VERSION
-    versionCode VERSION_CODE
-    versionName VERSION_NAME
+    defaultConfig {
+        minSdkVersion MIN_SDK_VERSION
+        targetSdkVersion TARGET_SDK_VERSION
+        versionCode VERSION_CODE
+        versionName VERSION_NAME
 
-    consumerProguardFiles 'proguard-consumer-rules.pro'
-  }
-
-  buildTypes {
-    debug {
-      debuggable true
-      minifyEnabled false
+        consumerProguardFiles 'proguard-consumer-rules.pro'
     }
-    release {
-      debuggable false
-      minifyEnabled true
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+        }
     }
-  }
 }
 
 apply from: rootProject.file('gradle/android_mvn_push.gradle')
 
 afterEvaluate {
-  javadoc.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
+    javadoc.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
 }
 
 dependencies {
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }

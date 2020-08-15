@@ -1,7 +1,10 @@
+@file:Suppress("UnstableApiUsage")
+
 package com.ironsource.aura.dslint.detectors
 
 import com.android.tools.lint.detector.api.*
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiMethod
 import com.intellij.psi.util.PropertyUtilBase
 import com.ironsource.aura.dslint.DSLintAnnotation
 import com.ironsource.aura.dslint.utils.nullIfEmpty
@@ -41,11 +44,45 @@ class DslMandatoryDetector : DSLintDetector() {
         dslPropertiesCalls
             .filterValues { it == 0 }
             .forEach {
-                val message = dslPropertiesDefs[it.key]?.getOrNull(0)?.message
-                    ?: "\"${it.key}\" property must be defined"
-                context.report(ISSUE, node, context.getLocation(node as UElement), message)
+                reportMissingMandatoryProperty(dslPropertiesDefs, it.key, context, node)
             }
     }
+
+    private fun reportMissingMandatoryProperty(
+        dslPropertiesDefs: Map<String, List<DSLMandatoryProperty>>,
+        group: String,
+        context: JavaContext,
+        node: ULambdaExpression
+    ) {
+        val message = dslPropertiesDefs[group]?.getOrNull(0)?.message
+            ?: "\"${group}\" property must be defined"
+        context.report(
+            ISSUE,
+            node,
+            context.getLocation(node as UElement),
+            message,
+            getFix(dslPropertiesDefs[group]!!)
+        )
+    }
+
+    private fun getFix(groupProperties: List<DSLMandatoryProperty>): LintFix {
+        val group = LintFix.create().group()
+        groupProperties.forEach {
+            val setSuffix = if (it.type == Type.PROPERTY) " = " else "{\n}"
+            group.add(
+                LintFix.create()
+                    .name("Define \"${it.name}\" property")
+                    .replace()
+                    .text("{")
+                    .with("{\n${it.name}$setSuffix")
+                    .reformat(true)
+                    .build()
+            )
+        }
+
+        return group.build()
+    }
+
 
     private fun getDslMandatoryCallsCount(
         dslProperties: Map<String, List<DSLMandatoryProperty>>,
@@ -116,25 +153,36 @@ class DslMandatoryDetector : DSLintDetector() {
                 it.hasAnnotation(DSLintAnnotation.DslMandatory.name)
             }
             .map {
-                val annotation = it.getAnnotation(DSLintAnnotation.DslMandatory.name)
-                val group =
-                    annotation.resolveStringAttributeValue(DSLintAnnotation.DslMandatory.Attributes.group)
-                        .nullIfEmpty()
-                val message =
-                    annotation.resolveStringAttributeValue(DSLintAnnotation.DslMandatory.Attributes.message)
-                        .nullIfEmpty()
-                val name =
-                    if (PropertyUtilBase.isSetterName(it.name)) PropertyUtilBase.getPropertyName(it)!! else it.name
-                DSLMandatoryProperty(name, group, message)
+                createDslMandatoryProperty(it)
             }
             .groupBy {
                 if (!it.group.isNullOrEmpty()) it.group else it.name
             }
     }
+
+    private fun createDslMandatoryProperty(method: PsiMethod): DSLMandatoryProperty {
+        val annotation = method.getAnnotation(DSLintAnnotation.DslMandatory.name)
+        val group =
+            annotation.resolveStringAttributeValue(DSLintAnnotation.DslMandatory.Attributes.group)
+                .nullIfEmpty()
+        val message =
+            annotation.resolveStringAttributeValue(DSLintAnnotation.DslMandatory.Attributes.message)
+                .nullIfEmpty()
+        val isPropertySetter = PropertyUtilBase.isSetterName(method.name)
+        val type = if (isPropertySetter) Type.PROPERTY else Type.FUNCTION
+        val name =
+            if (isPropertySetter) PropertyUtilBase.getPropertyName(method)!! else method.name
+        return DSLMandatoryProperty(name, type, group, message)
+    }
 }
 
 data class DSLMandatoryProperty(
     val name: String,
+    val type: Type,
     val group: String?,
     val message: String?
 )
+
+enum class Type {
+    FUNCTION, PROPERTY
+}

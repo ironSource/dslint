@@ -69,6 +69,11 @@ interface SomeDSLApi {
 ```
 ![Sample](images/sample_custom.png)
 
+Quickfix
+---
+DSLint offers quick fixes for adding missing mandatory properties. 
+![Sample](images/sample_quickfix.png)
+
 Download
 --------
 #### For app developers

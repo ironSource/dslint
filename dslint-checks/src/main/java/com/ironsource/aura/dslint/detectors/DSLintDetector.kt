@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 package com.ironsource.aura.dslint.detectors
 
 import com.android.tools.lint.client.api.UElementHandler

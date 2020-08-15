@@ -8,13 +8,17 @@ fun dslTest(block: SomeDSLApi.() -> Unit) = SomeDslApiImpl().apply(block)
 @DSLint
 interface SomeDSLApi {
 
+     object Group {
+        const val NAME = "name"
+    }
+
     @set:DSLMandatory(message = "ID please")
     var id: String
 
-    @set:DSLMandatory(group = "name")
+    @set:DSLMandatory(group = Group.NAME)
     var firstName: String
 
-    @set:DSLMandatory(group = "name")
+    @set:DSLMandatory(group = Group.NAME)
     var fullName: String
 
     var optionalProp: String

@@ -4,7 +4,8 @@ import com.android.tools.lint.detector.api.*
 import com.intellij.psi.PsiClass
 import com.intellij.psi.util.PropertyUtilBase
 import com.ironsource.aura.dslint.DSLintAnnotation
-import com.ironsource.aura.dslint.utils.resolveDeclaredStringAttributeValue
+import com.ironsource.aura.dslint.utils.nullIfEmpty
+import com.ironsource.aura.dslint.utils.resolveStringAttributeValue
 import org.jetbrains.uast.*
 import org.jetbrains.uast.util.isAssignment
 import org.jetbrains.uast.util.isMethodCall
@@ -117,12 +118,14 @@ class DslMandatoryDetector : DSLintDetector() {
             .map {
                 val annotation = it.getAnnotation(DSLintAnnotation.DslMandatory.name)
                 val group =
-                    annotation.resolveDeclaredStringAttributeValue(DSLintAnnotation.DslMandatory.Attributes.group)
+                    annotation.resolveStringAttributeValue(DSLintAnnotation.DslMandatory.Attributes.group)
+                        .nullIfEmpty()
                 val message =
-                    annotation.resolveDeclaredStringAttributeValue(DSLintAnnotation.DslMandatory.Attributes.message)
+                    annotation.resolveStringAttributeValue(DSLintAnnotation.DslMandatory.Attributes.message)
+                        .nullIfEmpty()
                 val name =
                     if (PropertyUtilBase.isSetterName(it.name)) PropertyUtilBase.getPropertyName(it)!! else it.name
-                DSLMandatoryProperty(name, group, if (!message.isNullOrEmpty()) message else null)
+                DSLMandatoryProperty(name, group, message)
             }
             .groupBy {
                 if (!it.group.isNullOrEmpty()) it.group else it.name

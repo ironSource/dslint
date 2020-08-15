@@ -76,6 +76,17 @@ DSLint offers quick fixes for adding missing mandatory properties.
 
 Download
 --------
+#### Add repo to project build.gradle
+```groovy
+allprojects {
+    repositories {
+        maven {
+            url  "https://dl.bintray.com/ironsource-aura/DSLint"
+        }
+    }
+}
+```
+
 #### For app developers
 ```groovy
 dependencies {

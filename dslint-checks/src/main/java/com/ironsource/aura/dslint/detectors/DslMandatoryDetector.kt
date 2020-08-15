@@ -19,9 +19,9 @@ class DslMandatoryDetector : DSLintDetector() {
 
     companion object {
         val ISSUE = Issue.create(
-            "DSLMandatory",
-            "Mandatory DSL property not defined",
-            "Mandatory DSL property not defined",
+            "Missing DSL attribute",
+            "Mandatory DSL attribute not defined",
+            "Mandatory DSL attribute not defined",
             Category.CORRECTNESS, 6,
             Severity.ERROR,
             Implementation(DslMandatoryDetector::class.java, Scope.JAVA_FILE_SCOPE)
@@ -44,18 +44,18 @@ class DslMandatoryDetector : DSLintDetector() {
         dslPropertiesCalls
             .filterValues { it == 0 }
             .forEach {
-                reportMissingMandatoryProperty(dslPropertiesDefs, it.key, context, node)
+                reportMissingMandatoryAttribute(dslPropertiesDefs, it.key, context, node)
             }
     }
 
-    private fun reportMissingMandatoryProperty(
-        dslPropertiesDefs: Map<String, List<DSLMandatoryProperty>>,
+    private fun reportMissingMandatoryAttribute(
+        dslPropertiesDefs: Map<String, List<DSLMandatoryAttribute>>,
         group: String,
         context: JavaContext,
         node: ULambdaExpression
     ) {
         val message = dslPropertiesDefs[group]?.getOrNull(0)?.message
-            ?: "\"${group}\" property must be defined"
+            ?: "\"${group}\" attribute must be defined"
         context.report(
             ISSUE,
             node,
@@ -65,13 +65,13 @@ class DslMandatoryDetector : DSLintDetector() {
         )
     }
 
-    private fun getFix(groupProperties: List<DSLMandatoryProperty>): LintFix {
+    private fun getFix(groupAttributes: List<DSLMandatoryAttribute>): LintFix {
         val group = LintFix.create().group()
-        groupProperties.forEach {
+        groupAttributes.forEach {
             val setSuffix = if (it.type == Type.PROPERTY) " = " else "{\n}"
             group.add(
                 LintFix.create()
-                    .name("Define \"${it.name}\" property")
+                    .name("Define \"${it.name}\" attribute")
                     .replace()
                     .text("{")
                     .with("{\n${it.name}$setSuffix")
@@ -85,7 +85,7 @@ class DslMandatoryDetector : DSLintDetector() {
 
 
     private fun getDslMandatoryCallsCount(
-        dslProperties: Map<String, List<DSLMandatoryProperty>>,
+        dslProperties: Map<String, List<DSLMandatoryAttribute>>,
         blockBody: UBlockExpression
     ): Map<String, Int> {
         val propertiesCalls = getDslPropertiesCallsCount(dslProperties, blockBody)
@@ -101,14 +101,14 @@ class DslMandatoryDetector : DSLintDetector() {
 
     // Returns mapping of group name to calls count
     private fun getDslMandatoryFunctionsCallsCount(
-        dslProperties: Map<String, List<DSLMandatoryProperty>>,
+        dslProperties: Map<String, List<DSLMandatoryAttribute>>,
         blockBody: UBlockExpression
     ): Map<String, Int> {
         return blockBody.expressions
             .filterIsInstance<UCallExpression>()
             .filter { it.isMethodCall() }
             .mapNotNull {
-                getPropertyGroup(it.methodName!!, dslProperties)
+                getAttributeGroup(it.methodName!!, dslProperties)
             }
             .groupingBy { it }
             .eachCount()
@@ -116,30 +116,30 @@ class DslMandatoryDetector : DSLintDetector() {
 
     // Returns mapping of group name to calls count
     private fun getDslPropertiesCallsCount(
-        dslProperties: Map<String, List<DSLMandatoryProperty>>,
+        dslProperties: Map<String, List<DSLMandatoryAttribute>>,
         blockBody: UBlockExpression
     ): Map<String, Int> {
         return blockBody.expressions
             .filterIsInstance<UBinaryExpression>()
             .filter { it.isAssignment() }
             .mapNotNull {
-                getPropertyGroup(getAssignedPropertyName(it), dslProperties)
+                getAttributeGroup(getAssignedAttributeName(it), dslProperties)
             }
             .groupingBy { it }
             .eachCount()
     }
 
-    private fun getAssignedPropertyName(it: UBinaryExpression) =
+    private fun getAssignedAttributeName(it: UBinaryExpression) =
         (((it.leftOperand as UReferenceExpression).referenceNameElement)
                 as UIdentifier).name
 
-    private fun getPropertyGroup(
-        propertyName: String,
-        dslProperties: Map<String, List<DSLMandatoryProperty>>
+    private fun getAttributeGroup(
+        attributeName: String,
+        dslProperties: Map<String, List<DSLMandatoryAttribute>>
     ): String? {
         dslProperties.forEach { (group, properties) ->
             val propertiesName = properties.map { it.name }
-            if (propertiesName.contains(propertyName)) {
+            if (propertiesName.contains(attributeName)) {
                 return group
             }
         }
@@ -147,20 +147,20 @@ class DslMandatoryDetector : DSLintDetector() {
     }
 
     // Return mapping of group name to mandatory properties, properties with no group are grouped by their name
-    private fun getDslMandatoryProperties(clazz: PsiClass): Map<String, List<DSLMandatoryProperty>> {
+    private fun getDslMandatoryProperties(clazz: PsiClass): Map<String, List<DSLMandatoryAttribute>> {
         return clazz.allMethods
             .filter {
                 it.hasAnnotation(DSLintAnnotation.DslMandatory.name)
             }
             .map {
-                createDslMandatoryProperty(it)
+                createDslMandatoryAttribute(it)
             }
             .groupBy {
                 if (!it.group.isNullOrEmpty()) it.group else it.name
             }
     }
 
-    private fun createDslMandatoryProperty(method: PsiMethod): DSLMandatoryProperty {
+    private fun createDslMandatoryAttribute(method: PsiMethod): DSLMandatoryAttribute {
         val annotation = method.getAnnotation(DSLintAnnotation.DslMandatory.name)
         val group =
             annotation.resolveStringAttributeValue(DSLintAnnotation.DslMandatory.Attributes.group)
@@ -172,11 +172,11 @@ class DslMandatoryDetector : DSLintDetector() {
         val type = if (isPropertySetter) Type.PROPERTY else Type.FUNCTION
         val name =
             if (isPropertySetter) PropertyUtilBase.getPropertyName(method)!! else method.name
-        return DSLMandatoryProperty(name, type, group, message)
+        return DSLMandatoryAttribute(name, type, group, message)
     }
 }
 
-data class DSLMandatoryProperty(
+data class DSLMandatoryAttribute(
     val name: String,
     val type: Type,
     val group: String?,

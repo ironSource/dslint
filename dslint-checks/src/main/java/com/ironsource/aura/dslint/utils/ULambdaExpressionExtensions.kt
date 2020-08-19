@@ -11,7 +11,9 @@ import org.jetbrains.uast.getParameterForArgument
 fun ULambdaExpression.getReceiverType(
     callExpression: UCallExpression
 ): PsiClass? {
+    // TODO - for some reason this is sometimes null
     val parameter = callExpression.getParameterForArgument(this)?.type
+    parameter ?: return null
 
     val receiverType = (parameter as PsiClassReferenceType).parameters.getOrNull(0)
 

@@ -29,8 +29,8 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.3.0'
 
     implementation project(":sample-sdk")
-//    implementation project(":dslint")
+    implementation project(":dslint")
 
-    implementation "com.ironsource.aura.dslint:dslint:$VERSION_NAME"
+//    implementation "com.ironsource.aura.dslint:dslint:1.0.1"
 }
 

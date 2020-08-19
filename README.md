@@ -74,6 +74,13 @@ Quickfix
 DSLint offers quick fixes for adding missing mandatory properties. 
 ![Sample](images/sample_quickfix.png)
 
+Requirements
+--------
+DSLint will always show errors inside Android Studio.
+In order for DSLint to also work on the gradle lint task (for release builds) the following conditions must be met:
+Gradle version >= 6.3
+Android Gradle Plugin >= 4.0.1
+
 Download
 --------
 #### For app developers

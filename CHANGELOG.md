@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+Version 1.0.2
+----------------------------
+Bug fixes
+
 Version 1.0.1
 ----------------------------
 Fixed annotations retention to support SDK usecases

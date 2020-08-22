@@ -86,15 +86,15 @@ Download
 #### For app developers
 ```groovy
 dependencies {
-    implementation 'com.ironsource.aura.dslint:dslint:1.0.2'
+    implementation 'com.ironsource.aura.dslint:dslint:1.0.3'
 }
 ```
 
 #### For SDK developers (DSLint linter will run on the app dependant on the SDK)
 ```groovy
 dependencies {
-    implementation 'com.ironsource.aura.dslint:dslint-annotations:1.0.2'
-    lintPublish 'com.ironsource.aura.dslint:dslint-checks:1.0.2'
+    implementation 'com.ironsource.aura.dslint:dslint-annotations:1.0.3'
+    lintPublish 'com.ironsource.aura.dslint:dslint-checks:1.0.3'
 }
 ```
 

@@ -5,6 +5,8 @@ apply from: '../versions.gradle'
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
+apply from: rootProject.file('gradle/mvn_push_java.gradle')
+
 dependencies {
   compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   compileOnly 'com.android.tools.lint:lint-api:27.0.1'
@@ -16,5 +18,3 @@ jar {
     attributes 'Lint-Registry-v2': 'com.ironsource.aura.dslint.LintRegistry'
   }
 }
-
-apply from: rootProject.file('gradle/java_mvn_push.gradle')

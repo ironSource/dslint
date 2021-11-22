@@ -25,11 +25,7 @@ android {
     }
 }
 
-apply from: rootProject.file('gradle/android_mvn_push.gradle')
-
-afterEvaluate {
-    javadoc.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
-}
+apply from: rootProject.file('gradle/mvn_push.gradle')
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

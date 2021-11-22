@@ -27,11 +27,7 @@ android {
     }
 }
 
-apply from: rootProject.file('gradle/android_mvn_push.gradle')
-
-afterEvaluate {
-    javadoc.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
-}
+apply from: rootProject.file('gradle/mvn_push.gradle')
 
 dependencies {
     api project(':dslint-annotations')
